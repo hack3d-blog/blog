@@ -1,0 +1,4 @@
+baseURL = 'https://hack3d.blog/'
+languageCode = 'en-us'
+title = 'Blog - Alex Conrey'
+theme = "ananke"

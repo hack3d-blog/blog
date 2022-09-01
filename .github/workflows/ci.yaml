@@ -1,0 +1,49 @@
+name: Build and Deploy
+
+on:
+  push:
+    # branches: [main]
+
+concurrency: ci-${{ github.ref }}
+
+env:
+  assets-bucket: hack3d-assets
+
+jobs:
+  blog:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Blog Assets
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true # fetch hugo themes
+      - name: Cache build output
+        id: build-cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.working-directory }}/build/**
+          key: frontend-build-${{ hashFiles('frontend/**') }}
+      - name: Setup Hugo
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.102.3'
+      - run: python -m pip install s3cmd
+        if: steps.build-cache.outputs.cache-hit != 'true'
+      - name: Build Assets
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: hugo --minify
+      - name: Deploy Assets
+        run: |
+            s3cmd \
+              --host=us-east-1.linodeobjects.com \
+              --host-bucket="%(bucket)s.us-east-1.linodeobjects.com" \
+              --no-mime-magic \
+              --no-delete-removed \
+              --acl-public \
+              sync \
+              public/ \
+              s3://${{ env.assets-bucket }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
