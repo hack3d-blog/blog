@@ -21,8 +21,8 @@ jobs:
         id: build-cache
         uses: actions/cache@v3
         with:
-          path: ${{ env.working-directory }}/build/**
-          key: frontend-build-${{ hashFiles('frontend/**') }}
+          path: public/**
+          key: blog-build-${{ hashFiles('**') }}
       - name: Setup Hugo
         if: steps.build-cache.outputs.cache-hit != 'true'
         uses: peaceiris/actions-hugo@v2
