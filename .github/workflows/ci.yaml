@@ -12,7 +12,7 @@ env:
 jobs:
   helm:
     runs-on: ubuntu-latest
-    name: Build and Deploy Blog Helm chart
+    name: Deploy Blog Helm chart
     steps:
       - uses: actions/checkout@v3
       - uses: azure/k8s-set-context@v2
@@ -23,9 +23,8 @@ jobs:
         run: |
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -
       - name: Deploy helm chart
-        working-directory: charts
         run: |
-          helm upgrade --install blog blog
+          helm upgrade --install blog charts/blog
   assets:
     runs-on: ubuntu-latest
     name: Build and Deploy Blog Assets
@@ -33,10 +32,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true # fetch hugo themes
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-          cache: 'pip'
       - run: python -m pip install s3cmd
       - name: Cache build output
         id: build-cache
