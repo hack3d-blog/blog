@@ -15,6 +15,8 @@ jobs:
     name: Deploy Blog Helm chart
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: azure/k8s-set-context@v2
         with:
           method: kubeconfig
