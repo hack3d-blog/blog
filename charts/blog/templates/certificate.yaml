@@ -1,0 +1,25 @@
+{{- if .Values.letsencrypt.enabled }}
+{{- $fullName := include "blog.fullname" . -}}
+{{- $letsencrypt := .Values.letsencrypt}}
+{{- $certificate := $letsencrypt.certificate }}
+{{- $clusterIssuer := $letsencrypt.clusterIssuer }}
+{{- $secretName := $certificate.secretName | default $clusterIssuer.privateKeyRef }}
+{{- $clusterIssuerName := $clusterIssuer.name | default $fullName }}
+{{- $clusterIssuerKind := $clusterIssuer.kind | default "ClusterIssuer" }}
+{{- $dnsNames := $certificate.dnsNames}}
+{{- $duration := $certificate.duration | default "2160h" }}
+{{- $renewBefore := $certificate.renewBefore | default "360h" }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $fullName }}
+spec:
+  secretName: {{ $secretName }}
+  duration: {{ $duration }}
+  renewBefore: {{ $renewBefore }}
+  issuerRef:
+    name: {{ $clusterIssuerName }}
+    kind: {{ $clusterIssuerKind }}
+  dnsNames:
+  {{ $dnsNames | toYaml | indent 2}}
+{{- end }}
