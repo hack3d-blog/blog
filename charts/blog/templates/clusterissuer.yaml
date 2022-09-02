@@ -1,0 +1,17 @@
+{{- if .Values.letsencrypt.enabled }}
+{{- $fullName := include "blog.fullname" . -}}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ $fullName }}
+spec:
+  acme:
+    email: {{ .Values.letsencrypt.clusterIssuer.email }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: {{ .Values.letsencrypt.clusterIssuer.privateKeyRef }}
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+{{- end }}

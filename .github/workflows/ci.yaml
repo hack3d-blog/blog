@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    # branches: [main]
 
 concurrency: ci-${{ github.ref }}
 
@@ -27,7 +27,7 @@ jobs:
       - run: ls -la 
       - name: Deploy helm chart
         working-directory: charts
-        run: helm upgrade --install blog charts/blog
+        run: helm upgrade --install blog blog
   assets:
     runs-on: ubuntu-latest
     name: Build and Deploy Blog Assets
