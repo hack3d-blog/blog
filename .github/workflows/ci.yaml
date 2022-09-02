@@ -7,7 +7,7 @@ on:
 concurrency: ci-${{ github.ref }}
 
 env:
-  assets-bucket: hack3d.blog
+  assets-bucket: hack3d-assets
 
 jobs:
   helm:
