@@ -22,9 +22,10 @@ jobs:
       - name: Install helm
         run: |
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -
+      - run: ls -la 
       - name: Deploy helm chart
-        run: |
-          helm upgrade --install blog charts/blog
+        working-directory: charts
+        run: helm upgrade --install blog charts/blog
   assets:
     runs-on: ubuntu-latest
     name: Build and Deploy Blog Assets
