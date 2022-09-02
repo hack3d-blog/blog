@@ -10,28 +10,48 @@ env:
   assets-bucket: hack3d.blog
 
 jobs:
-  blog:
+  helm
+    runs-on: ubuntu-latest
+    name: Build and Deploy Blog Helm chart
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/k8s-set-context@v2
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      - name: Install helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -
+      - name: Deploy helm chart
+        working-directory: charts
+        run: |
+          helm upgrade --install blog blog
+  assets:
     runs-on: ubuntu-latest
     name: Build and Deploy Blog Assets
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true # fetch hugo themes
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Setup Hugo
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.102.3'
       - name: Cache build output
         id: build-cache
         uses: actions/cache@v3
         with:
           path: public/**
           key: blog-build-${{ hashFiles('**') }}
-      - name: Setup Hugo
-        if: steps.build-cache.outputs.cache-hit != 'true'
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: '0.102.3'
+      - run: python -m pip install s3cmd
       - name: Build Assets
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: hugo --minify
-      - run: python -m pip install s3cmd
       - name: Deploy Assets
         run: |
             s3cmd \
@@ -41,7 +61,7 @@ jobs:
               --no-delete-removed \
               --acl-public \
               sync \
-              public/ \
+              public/* \
               s3://${{ env.assets-bucket }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
