@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    # branches: [main]
 
 concurrency: ci-${{ github.ref }}
 
@@ -10,7 +10,7 @@ env:
   assets-bucket: hack3d.blog
 
 jobs:
-  helm
+  helm:
     runs-on: ubuntu-latest
     name: Build and Deploy Blog Helm chart
     steps:
@@ -37,18 +37,18 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
-      - name: Setup Hugo
-        if: steps.build-cache.outputs.cache-hit != 'true'
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: '0.102.3'
+      - run: python -m pip install s3cmd
       - name: Cache build output
         id: build-cache
         uses: actions/cache@v3
         with:
           path: public/**
           key: blog-build-${{ hashFiles('**') }}
-      - run: python -m pip install s3cmd
+      - name: Setup Hugo
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.102.3'
       - name: Build Assets
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: hugo --minify
