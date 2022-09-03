@@ -1,4 +1,9 @@
 baseURL = 'https://hack3d.blog/'
 languageCode = 'en-us'
-title = 'Blog - Alex Conrey'
+title = 'hack3d.blog'
 theme = "ananke"
+
+[taxonomies]
+  category = 'categories'
+  series = 'series'
+  tag = 'tags'
