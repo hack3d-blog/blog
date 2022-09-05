@@ -3,6 +3,8 @@ languageCode = 'en-us'
 title = 'hack3d.blog'
 theme = "ananke"
 
+googleAnalytics = "G-LVTLQ50FTJ"
+
 [taxonomies]
   category = 'categories'
   series = 'series'
